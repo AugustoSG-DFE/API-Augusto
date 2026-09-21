@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineLog - Catálogo de Filmes com Avaliação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0b0e;
+            --bg-card: #141419;
+            --primary: #e50914;
+            --primary-hover: #b20710;
+            --text-main: #e0e0e0;
+            --text-muted: #8c8c94;
+            --border: #262630;
+            --star-color: #f39c12;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 30px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+            background: var(--bg-card);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-badge {
+            background: rgba(229, 9, 20, 0.15);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(229, 9, 20, 0.3);
+        }
+
+        .form-section {
+            background: #1a1a24;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        input, select {
+            padding: 12px 15px;
+            background: #111116;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 5px rgba(229, 9, 20, 0.4);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #33333d; color: #fff; display: none; }
+        .btn-secondary:hover { background: #444452; }
+
+        .filter-bar {
+            margin-bottom: 20px;
+        }
+
+        .filter-bar input {
+            width: 100%;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #1a1a24;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+        .movie-poster {
+            width: 55px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #222;
+        }
+
+        .genre-tag {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .rating-stars {
+            color: var(--star-color);
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-edit { background: #f39c12; color: #111; padding: 6px 12px; font-size: 12px; }
+        .btn-edit:hover { background: #d68910; }
+
+        .btn-delete { background: #e74c3c; color: #fff; padding: 6px 12px; font-size: 12px; }
+        .btn-delete:hover { background: #c0392b; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🍿 CineLog <span style="font-size: 14px; font-weight: 300; color: var(--text-muted);">| Catálogo de Filmes</span></h1>
+        <div class="stats-badge" id="totalFilmesBadge">0 filmes cadastrados</div>
+    </header>
+
+    <div class="form-section">
+        <h3 id="formTitle">✨ Adicionar Novo Filme</h3>
+        <form id="filmeForm">
+            <input type="hidden" id="filmeId">
+            <div class="form-grid">
+                <input type="text" id="titulo" placeholder="Título do Filme" required>
+                <input type="text" id="genero" placeholder="Gênero (ex: Ação, Drama)" required>
+                <input type="number" id="ano" placeholder="Ano (ex: 2023)" min="1900" max="2030" required>
+                <select id="nota" required>
+                    <option value="" disabled selected>Nota (0 a 5)</option>
+                    <option value="0">0.0 - Horrível</option>
+                    <option value="0.5">0.5</option>
+                    <option value="1">1.0 - Ruim</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2">2.0 - Regular</option>
+                    <option value="2.5">2.5</option>
+                    <option value="3">3.0 - Bom</option>
+                    <option value="3.5">3.5</option>
+                    <option value="4">4.0 - Ótimo</option>
+                    <option value="4.5">4.5</option>
+                    <option value="5">5.0 - obra-prima</option>
+                </select>
+                <input type="url" id="capa" placeholder="URL do Pôster (Opcional)">
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-primary" id="btnSalvar">Salvar no Catálogo</button>
+                <button type="button" class="btn-secondary" id="btnCancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="filter-bar">
+        <input type="text" id="inputBusca" placeholder="🔍 Pesquisar filme por título ou gênero..." oninput="filtrarFilmes()">
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 75px;">Pôster</th>
+                    <th>Título</th>
+                    <th>Gênero</th>
+                    <th>Ano</th>
+                    <th>Nota</th>
+                    <th style="width: 140px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaFilmes">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let filmes = [];
+    let contadorId = 1;
+
+    const form = document.getElementById('filmeForm');
+    const inputId = document.getElementById('filmeId');
+    const inputTitulo = document.getElementById('titulo');
+    const inputGenero = document.getElementById('genero');
+    const inputAno = document.getElementById('ano');
+    const inputNota = document.getElementById('nota');
+    const inputCapa = document.getElementById('capa');
+    const inputBusca = document.getElementById('inputBusca');
+    const tabelaFilmes = document.getElementById('tabelaFilmes');
+    const formTitle = document.getElementById('formTitle');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const totalFilmesBadge = document.getElementById('totalFilmesBadge');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = inputId.value;
+        const titulo = inputTitulo.value.trim();
+        const genero = inputGenero.value.trim();
+        const ano = parseInt(inputAno.value);
+        const nota = parseFloat(inputNota.value);
+        const capa = inputCapa.value.trim();
+
+        if (id) {
+            const index = filmes.findIndex(f => f.id == id);
+            if (index !== -1) {
+                filmes[index] = { id: Number(id), titulo, genero, ano, nota, capa };
+            }
+        } else {
+            const novoFilme = { id: contadorId++, titulo, genero, ano, nota, capa };
+            filmes.push(novoFilme);
+        }
+
+        resetarFormulario();
+        filtrarFilmes();
+    });
+
+    function formatarEstrelas(nota) {
+        return `⭐ ${nota.toFixed(1)}`;
+    }
+
+    function renderizarTabela(lista = filmes) {
+        tabelaFilmes.innerHTML = '';
+        
+        totalFilmesBadge.innerText = `${filmes.length} filme${filmes.length !== 1 ? 's' : ''} cadastrado${filmes.length !== 1 ? 's' : ''}`;
+
+        if (lista.length === 0) {
+            tabelaFilmes.innerHTML = `<tr><td colspan="6" class="empty-state">Nenhum filme encontrado no catálogo.</td></tr>`;
+            return;
+        }
+
+        const listaOrdenada = [...lista].sort((a, b) => b.nota - a.nota);
+
+        listaOrdenada.forEach(f => {
+            const tr = document.createElement('tr');
+            const posterHtml = f.capa 
+                ? `<img src="${f.capa}" alt="${f.titulo}" class="movie-poster" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'55\' height=\'75\'><rect width=\'100%\' height=\'100%\' fill=\'%23222\'/><text x=\'50%\' y=\'50%\' fill=\'%23888\' font-size=\'11\' text-anchor=\'middle\' dominant-baseline=\'central\'>N/A</text></svg>';">`
+                : `<div class="movie-poster" style="display: flex; align-items: center; justify-content: center; color: #888; font-size: 11px; font-weight: 600;">N/A</div>`;
+
+            tr.innerHTML = `
+                <td>${posterHtml}</td>
+                <td><strong>${f.titulo}</strong></td>
+                <td><span class="genre-tag">${f.genero}</span></td>
+                <td>${f.ano}</td>
+                <td><span class="rating-stars">${formatarEstrelas(f.nota)}</span></td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-edit" onclick="prepararEdicao(${f.id})">Editar</button>
+                        <button class="btn-delete" onclick="removerFilme(${f.id})">Excluir</button>
+                    </div>
+                </td>
+            `;
+            tabelaFilmes.appendChild(tr);
+        });
+    }
+
+    function filtrarFilmes() {
+        const termo = inputBusca.value.toLowerCase();
+        const filtrados = filmes.filter(f => 
+            f.titulo.toLowerCase().includes(termo) || 
+            f.genero.toLowerCase().includes(termo)
+        );
+        renderizarTabela(filtrados);
+    }
+
+    function prepararEdicao(id) {
+        const filme = filmes.find(f => f.id === id);
+        if (filme) {
+            inputId.value = filme.id;
+            inputTitulo.value = filme.titulo;
+            inputGenero.value = filme.genero;
+            inputAno.value = filme.ano;
+            inputNota.value = filme.nota;
+            inputCapa.value = filme.capa;
+            
+            formTitle.innerText = `✏️ Editando: ${filme.titulo}`;
+            btnSalvar.innerText = "Atualizar Filme";
+            btnCancelar.style.display = "inline-block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function cancelarEdicao() {
+        resetarFormulario();
+    }
+
+    function resetarFormulario() {
+        form.reset();
+        inputId.value = '';
+        formTitle.innerText = "✨ Adicionar Novo Filme";
+        btnSalvar.innerText = "Salvar no Catálogo";
+        btnCancelar.style.display = "none";
+    }
+
+    function removerFilme(id) {
+        if (confirm("Tem certeza que deseja remover este filme do catálogo?")) {
+            filmes = filmes.filter(f => f.id !== id);
+            filtrarFilmes(); 
+        }
+    }
+
+    renderizarTabela();
+</script>
+
+</body>
+</html>

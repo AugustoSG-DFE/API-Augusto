@@ -1,0 +1,3 @@
+{
+  "package.json": "{\n  \"name\": \"cinelog\",\n  \"version\": \"1.0.0\",\n  \"main\": \"server.js\",\n  \"dependencies\": {\n    \"express\": \"^4.19.2\"\n  }\n}"
+}
